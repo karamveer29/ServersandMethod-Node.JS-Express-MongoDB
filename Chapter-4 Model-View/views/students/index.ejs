@@ -1,0 +1,81 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Management | MVC</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 900px;
+            margin: 35px auto;
+            padding: 0 16px;
+            background: #f4f6f9;
+            color: #222;
+        }
+        h1 { color: #23784b; }
+        form, .student {
+            background: white;
+            padding: 16px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+        }
+        input {
+            display: block;
+            box-sizing: border-box;
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0;
+        }
+        button, .edit-link {
+            display: inline-block;
+            padding: 9px 12px;
+            margin: 4px 4px 4px 0;
+            cursor: pointer;
+        }
+        .edit-link { color: #175cd3; }
+        .student { overflow-wrap: anywhere; }
+    </style>
+</head>
+<body>
+    <h1>Student Management System</h1>
+    <p>Node.js + Express + MongoDB + MVC</p>
+
+    <h2>Add Student</h2>
+
+    <form action="/students" method="POST">
+        <input name="name" placeholder="Student name" required>
+        <input name="age" type="number" min="1" placeholder="Age" required>
+        <input name="email" type="email" placeholder="Email" required>
+        <input name="course" placeholder="Course">
+        <button type="submit">Add Student</button>
+    </form>
+
+    <h2>All Students (<%= students.length %>)</h2>
+
+    <% if (students.length === 0) { %>
+        <p>No students found. Add your first student above.</p>
+    <% } %>
+
+    <% students.forEach(student => { %>
+        <div class="student">
+            <h3><%= student.name %></h3>
+            <p>Age: <%= student.age %></p>
+            <p>Email: <%= student.email %></p>
+            <p>Course: <%= student.course || 'Not specified' %></p>
+            <p>ID: <%= student._id %></p>
+
+            <a class="edit-link"
+               href="/students/<%= student._id %>/edit">Edit</a>
+
+            <form action="/students/<%= student._id %>/delete"
+                  method="POST"
+                  style="display:inline-block; padding:0; margin:0;"
+                  onsubmit="return confirm('Delete this student?')">
+                <button type="submit">Delete</button>
+            </form>
+        </div>
+    <% }) %>
+</body>
+</html>

@@ -1,0 +1,232 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>LinkLite | URL Shortener</title>
+
+    <style>
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            padding: 30px 16px;
+            background: #f3f6fb;
+            color: #182230;
+            font-family: Arial, sans-serif;
+        }
+
+        main {
+            max-width: 900px;
+            margin: auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            color: #2563eb;
+            font-size: 38px;
+            margin-bottom: 10px;
+        }
+
+        .panel, .url-card {
+            background: white;
+            padding: 22px;
+            border-radius: 14px;
+            margin-bottom: 18px;
+            box-shadow: 0 4px 18px #1018280b;
+        }
+
+        label {
+            display: block;
+            margin: 14px 0 7px;
+            font-weight: bold;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccd3df;
+            border-radius: 8px;
+            font-size: 15px;
+        }
+
+        button {
+            padding: 11px 15px;
+            border: 0;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .primary {
+            margin-top: 16px;
+            width: 100%;
+            background: #2563eb;
+            color: white;
+            font-weight: bold;
+        }
+
+        .url-card {
+            overflow-wrap: anywhere;
+        }
+
+        .short-link {
+            color: #2563eb;
+            font-weight: bold;
+        }
+
+        .original {
+            color: #667085;
+            font-size: 14px;
+            overflow-wrap: anywhere;
+        }
+
+        .actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 14px;
+        }
+
+        .copy {
+            background: #e8efff;
+            color: #1d4ed8;
+        }
+
+        .open {
+            background: #e7f7ed;
+            color: #16703b;
+        }
+
+        .delete {
+            background: #feeceb;
+            color: #b42318;
+        }
+
+        .stats {
+            color: #667085;
+            font-size: 13px;
+        }
+
+        .empty {
+            text-align: center;
+            color: #667085;
+            padding: 25px;
+        }
+
+        @media (max-width: 500px) {
+            header h1 { font-size: 30px; }
+            .panel, .url-card { padding: 16px; }
+        }
+    </style>
+</head>
+
+<body>
+<main>
+    <header>
+        <h1>LinkLite</h1>
+        <p>Shorten long URLs. Share links. Track clicks.</p>
+    </header>
+
+    <section class="panel">
+        <h2>Create a short link</h2>
+
+        <form action="/shorten" method="POST">
+            <label for="originalUrl">Destination URL</label>
+            <input
+                id="originalUrl"
+                name="originalUrl"
+                type="url"
+                placeholder="https://example.com/your/long/link"
+                required
+            >
+
+            <label for="customCode">Custom alias (optional)</label>
+            <input
+                id="customCode"
+                name="customCode"
+                type="text"
+                minlength="3"
+                maxlength="30"
+                pattern="[a-zA-Z0-9_-]{3,30}"
+                placeholder="my-portfolio"
+            >
+
+            <button class="primary" type="submit">
+                Shorten URL
+            </button>
+        </form>
+    </section>
+
+    <h2>Your saved links (<%= urls.length %>)</h2>
+
+    <% if (urls.length === 0) { %>
+        <section class="panel empty">
+            No links yet. Create your first short URL above.
+        </section>
+    <% } %>
+
+    <% urls.forEach(url => { %>
+        <article class="url-card">
+            <p>
+                <a
+                    class="short-link"
+                    href="/<%= encodeURIComponent(url.shortCode) %>"
+                ><%= baseUrl %>/<%= url.shortCode %></a>
+            </p>
+
+            <p class="original"><%= url.originalUrl %></p>
+
+            <p class="stats">
+                Clicks: <strong><%= url.clicks %></strong>
+                · Created: <%= new Date(url.createdAt).toLocaleString() %>
+            </p>
+
+            <div class="actions">
+                <button
+                    class="copy"
+                    type="button"
+                    data-copy="<%= baseUrl %>/<%= url.shortCode %>"
+                >Copy link</button>
+
+                <a
+                    href="/<%= encodeURIComponent(url.shortCode) %>"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
+                    <button class="open" type="button">Open link</button>
+                </a>
+
+                <form
+                    action="/delete/<%= url._id %>"
+                    method="POST"
+                    onsubmit="return confirm('Delete this short URL?')"
+                >
+                    <button class="delete" type="submit">Delete</button>
+                </form>
+            </div>
+        </article>
+    <% }) %>
+</main>
+
+<script>
+    document.querySelectorAll('[data-copy]').forEach(button => {
+        button.addEventListener('click', async () => {
+            try {
+                await navigator.clipboard.writeText(button.dataset.copy);
+                button.textContent = 'Copied!';
+                setTimeout(() => button.textContent = 'Copy link', 1500);
+            } catch {
+                window.prompt('Copy your short URL:', button.dataset.copy);
+            }
+        });
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,53 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Student</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 40px auto;
+            padding: 0 16px;
+            background: #f4f6f9;
+        }
+        form {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        input {
+            box-sizing: border-box;
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+        }
+        button { padding: 10px 14px; }
+    </style>
+</head>
+<body>
+    <h1>Edit Student</h1>
+
+    <form action="/students/<%= student._id %>/update" method="POST">
+        <label>Name</label>
+        <input name="name" value="<%= student.name %>" required>
+
+        <label>Age</label>
+        <input name="age" type="number" min="1"
+               value="<%= student.age %>" required>
+
+        <label>Email</label>
+        <input name="email" type="email"
+               value="<%= student.email %>" required>
+
+        <label>Course</label>
+        <input name="course" value="<%= student.course || '' %>">
+
+        <button type="submit">Save Changes</button>
+        <a href="/students">Cancel</a>
+    </form>
+</body>
+</html>
